@@ -1,250 +1,239 @@
-import React, { Component } from 'react';
-import uuid from 'uuid/v4';
-import styled from 'styled-components';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-const container_amount = 3;
+import React, { Component } from 'react'
+import uuid from 'uuid/v4'
+import styled from 'styled-components'
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
+const container_amount = 3
 
-const makeList = (count) => {
-    return Array.from({ length: count }, () => ({ [uuid()]: [] }));
-};
-
-
+const makeList = count => {
+  return Array.from({ length: count }, () => ({ [uuid()]: [] }))
+}
 
 const Content = styled.div`
-    margin-right: 50%;
-`;
+  margin-right: 50%;
+`
 
 const Item = styled.div`
-    display: flex;
-    user-select: none;
-    padding: 0.5rem;
-    margin: 0 0 0.5rem 0;
-    align-items: flex-start;
-    align-content: flex-start;
-    line-height: 1.5;
-    border-radius: 3px;
-    background: #fff;
-    border: 1px ${(props) => (props.isDragging ? 'dashed #000' : 'solid #ddd')};
-`;
+  display: flex;
+  user-select: none;
+  padding: 0.5rem;
+  margin: 0 0 0.5rem 0;
+  align-items: flex-start;
+  align-content: flex-start;
+  line-height: 1.5;
+  border-radius: 3px;
+  background: #fff;
+  border: 1px ${props => (props.isDragging ? 'dashed #000' : 'solid #ddd')};
+`
 
 const Clone = styled(Item)`
-    + div {
-        display: none !important;
-    }
-`;
+  + div {
+    display: none !important;
+  }
+`
 
 const List = styled.div`
-    border: 1px
-        ${(props) => (props.isDraggingOver ? 'dashed #000' : 'solid #ddd')};
-    background: #fff;
-    padding: 0.5rem 0.5rem 0;
-    border-radius: 3px;
-    flex: 0 0 150px;
-    font-family: sans-serif;
-    min-height: 56px;
-`;
+  border: 1px ${props => (props.isDraggingOver ? 'dashed #000' : 'solid #ddd')};
+  background: #fff;
+  padding: 0.5rem 0.5rem 0;
+  border-radius: 3px;
+  flex: 0 0 150px;
+  font-family: sans-serif;
+  min-height: 56px;
+`
 
 const KioskContainer = styled(List)`
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: 50%;
-`;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 50%;
+`
 
 const Kiosk = styled(List)`
-    position: relative;
-    border:0px;
-`;
+  position: relative;
+  border: 0px;
+`
 
 const Container = styled(List)`
-    margin: 0.5rem;
-`;
+  margin: 0.5rem;
+`
 
 const Notice = styled.div`
-    display: flex;
-    align-items: center;
-    align-content: center;
-    justify-content: center;
-    padding: 0.5rem;
-    margin: 0 0.5rem 0.5rem;
-    border: 1px solid transparent;
-    line-height: 1.5;
-    color: #aaa;
-`;
+  display: flex;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+  padding: 0.5rem;
+  margin: 0 0.5rem 0.5rem;
+  border: 1px solid transparent;
+  line-height: 1.5;
+  color: #aaa;
+`
 
 const ITEMS = [
-    {
-        id: uuid(),
-        content: 'id'
-    },
-    {
-        id: uuid(),
-        content: 'title'
-    },
-    {
-        id: uuid(),
-        content: 'desc'
-    },
-    {
-        id: uuid(),
-        content: 'price'
-    },
-    {
-        id: uuid(),
-        content: 'oriprice'
-    },
-    {
-        id: uuid(),
-        content: 'discount'
-    }
-];
+  {
+    id: uuid(),
+    content: 'id',
+  },
+  {
+    id: uuid(),
+    content: 'title',
+  },
+  {
+    id: uuid(),
+    content: 'desc',
+  },
+  {
+    id: uuid(),
+    content: 'price',
+  },
+  {
+    id: uuid(),
+    content: 'oriprice',
+  },
+  {
+    id: uuid(),
+    content: 'discount',
+  },
+]
 
 const ITEMS2 = [
-    {
-        id: uuid(),
-        content: 'id2'
-    },
-    {
-        id: uuid(),
-        content: 'title2'
-    },
-    {
-        id: uuid(),
-        content: 'desc2'
-    }
-];
+  {
+    id: uuid(),
+    content: 'id2',
+  },
+  {
+    id: uuid(),
+    content: 'title2',
+  },
+  {
+    id: uuid(),
+    content: 'desc2',
+  },
+]
 
-const ITEMS3 =[{
+const ITEMS3 = [
+  {
     id: uuid(),
-    content: 'price3'
-},
-{
+    content: 'price3',
+  },
+  {
     id: uuid(),
-    content: 'oriprice3'
-},
-{
+    content: 'oriprice3',
+  },
+  {
     id: uuid(),
-    content: 'discount3'
-}
-];
+    content: 'discount3',
+  },
+]
 
 const _data = {
-    ITEMS: ITEMS,
-    ITEMS2: ITEMS2,
-    ITEMS3: ITEMS3
-};
+  ITEMS: ITEMS,
+  ITEMS2: ITEMS2,
+  ITEMS3: ITEMS3,
+}
 
 const setData = (source, destination, droppableSource) => {
-    const sourceClone = Object.assign({}, source);
-    const destClone = Array.from(destination);
-    const item = sourceClone[droppableSource.droppableId][droppableSource.index];
-    destClone.splice(0, 1, { ...item, id: uuid() });
-    return destClone;
-};
+  const sourceClone = Object.assign({}, source)
+  const destClone = Array.from(destination)
+  const item = sourceClone[droppableSource.droppableId][droppableSource.index]
+  destClone.splice(0, 1, { ...item, id: uuid() })
+  return destClone
+}
+
+class g extends Component {
+  render() {
+    const { data } = this.props
+    return (
+      <KioskContainer>
+        {Object.keys(data).map((itm, idx) => (
+          <React.Fragment key={itm}>
+            <li>{itm}</li>
+            <Droppable
+              key={idx}
+              droppableId={itm}
+              isDropDisabled={true}
+              isCombineEnabled={true}>
+              {(provided, snapshot) => (
+                <Kiosk
+                  innerRef={provided.innerRef}
+                  isDraggingOver={snapshot.isDraggingOver}>
+                  {_data[itm].map((item, index) => (
+                    <Draggable
+                      key={item.id}
+                      draggableId={item.id}
+                      index={index}>
+                      {(provided, snapshot) => (
+                        <React.Fragment>
+                          <Item
+                            key={item.id}
+                            innerRef={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            isDragging={snapshot.isDragging}
+                            style={provided.draggableProps.style}>
+                            {item.content}
+                          </Item>
+                          {snapshot.isDragging && <Clone>{item.content}</Clone>}
+                        </React.Fragment>
+                      )}
+                    </Draggable>
+                  ))}
+                </Kiosk>
+              )}
+            </Droppable>
+          </React.Fragment>
+        ))}
+      </KioskContainer>
+    )
+  }
+}
 
 export default class App extends Component {
-    state = { ...makeList(container_amount) };
-    onDragEnd = (result) => {
-        const { source, destination } = result;
+  state = { ...makeList(container_amount) }
+  onDragEnd = result => {
+    const { source, destination } = result
 
-        // dropped outside the list
-        if (!destination) {
-            return;
-        }
-        this.setState({
-            [destination.droppableId]: setData(
-                _data,
-                this.state[destination.droppableId],
-                source
-            )
-        });
-    };
-
-    // Normally you would want to split things out into separate components.
-    // But in this example everything is just done in one place for simplicity
-    render() {
-        console.log(this.state)
-        return (
-            <DragDropContext onDragEnd={this.onDragEnd}>
-                <KioskContainer>
-                    {Object.keys(_data).map((itm, idx) => (
-                        <>
-                        <li>{itm}</li>
-                        <Droppable
-                            key={idx}
-                            droppableId={itm}
-                            isDropDisabled={true}
-                            isCombineEnabled={true}>
-                            {(provided, snapshot) => (
-                                <Kiosk
-                                    innerRef={provided.innerRef}
-                                    isDraggingOver={snapshot.isDraggingOver}>
-                                    {_data[itm].map((item, index) => (
-                                        <Draggable
-                                            key={item.id}
-                                            draggableId={item.id}
-                                            index={index}>
-                                            {(provided, snapshot) => (
-                                                <React.Fragment>
-                                                    <Item
-                                                        innerRef={
-                                                            provided.innerRef
-                                                        }
-                                                        {...provided.draggableProps}
-                                                        {...provided.dragHandleProps}
-                                                        isDragging={
-                                                            snapshot.isDragging
-                                                        }
-                                                        style={
-                                                            provided
-                                                                .draggableProps
-                                                                .style
-                                                        }>
-                                                        {item.content}
-                                                    </Item>
-                                                    {snapshot.isDragging && (
-                                                        <Clone>
-                                                            {item.content}
-                                                        </Clone>
-                                                    )}
-                                                </React.Fragment>
-                                            )}
-                                        </Draggable>
-                                    ))}
-                                </Kiosk>
-                            )}
-                        </Droppable>
-                        </>
-                    ))}
-                </KioskContainer>
-
-                <Content>
-                    {Object.keys(this.state).map((list, i) => (
-                        <Droppable key={list} droppableId={list}>
-                            {(provided, snapshot) => (
-                                <Container
-                                    innerRef={provided.innerRef}
-                                    isDraggingOver={snapshot.isDraggingOver}>
-                                    {this.state[list].length
-                                        ? this.state[
-                                              list
-                                          ].map((item, index) => (
-                                              <Item key={index}>
-                                                  {item.content}
-                                              </Item>
-                                          ))
-                                        : !provided.placeholder && (
-                                              <Notice>Drop items here</Notice>
-                                          )}
-                                </Container>
-                            )}
-                        </Droppable>
-                    ))}
-                </Content>
-            </DragDropContext>
-        );
+    // dropped outside the list
+    if (!destination) {
+      return
     }
+    this.setState({
+      [destination.droppableId]: setData(
+        _data,
+        this.state[destination.droppableId],
+        source
+      ),
+    })
+  }
+
+  // Normally you would want to split things out into separate components.
+  // But in this example everything is just done in one place for simplicity
+  render() {
+    console.log(this.state)
+    return (
+      <DragDropContext onDragEnd={this.onDragEnd}>
+        <DragGroups data={_data}></DragGroups>
+        <Content>
+          {Object.keys(this.state).map((list, i) => (
+            <Droppable key={list} droppableId={list}>
+              {(provided, snapshot) => (
+                <Container
+                  innerRef={provided.innerRef}
+                  isDraggingOver={snapshot.isDraggingOver}>
+                  {this.state[list].length
+                    ? this.state[list].map((item, index) => (
+                        <Item key={index}>{item.content}</Item>
+                      ))
+                    : !provided.placeholder && <Notice>Drop items here</Notice>}
+                </Container>
+              )}
+            </Droppable>
+          ))}
+        </Content>
+      </DragDropContext>
+    )
+  }
 }
 
 const jsonData = `
@@ -336,4 +325,4 @@ const jsonData = `
       ]
     }
   }
-`;
+`
