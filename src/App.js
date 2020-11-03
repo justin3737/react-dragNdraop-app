@@ -54,6 +54,7 @@ const KioskContainer = styled(List)`
 
 const Kiosk = styled(List)`
     position: relative;
+    border:0px;
 `;
 
 const Container = styled(List)`
@@ -114,9 +115,24 @@ const ITEMS2 = [
     }
 ];
 
+const ITEMS3 =[{
+    id: uuid(),
+    content: 'price3'
+},
+{
+    id: uuid(),
+    content: 'oriprice3'
+},
+{
+    id: uuid(),
+    content: 'discount3'
+}
+];
+
 const _data = {
     ITEMS: ITEMS,
-    ITEMS2: ITEMS2
+    ITEMS2: ITEMS2,
+    ITEMS3: ITEMS3
 };
 
 const setData = (source, destination, droppableSource) => {
@@ -153,6 +169,8 @@ export default class App extends Component {
             <DragDropContext onDragEnd={this.onDragEnd}>
                 <KioskContainer>
                     {Object.keys(_data).map((itm, idx) => (
+                        <>
+                        <li>{itm}</li>
                         <Droppable
                             key={idx}
                             droppableId={itm}
@@ -197,6 +215,7 @@ export default class App extends Component {
                                 </Kiosk>
                             )}
                         </Droppable>
+                        </>
                     ))}
                 </KioskContainer>
 
