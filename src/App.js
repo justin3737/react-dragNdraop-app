@@ -141,7 +141,7 @@ const setData = (source, destination, droppableSource) => {
   return destClone
 }
 
-class g extends Component {
+class DragGroups extends Component {
   render() {
     const { data } = this.props
     return (
