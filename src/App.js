@@ -70,6 +70,13 @@ const Notice = styled.div`
   color: #aaa;
 `
 
+const data2 = [
+  {
+    Key: "type",
+    Mandatory: "Y",
+    Value: "4"
+  },
+]
 const data1 = [
   {
     campaign_special: '',
@@ -89,6 +96,7 @@ const data1 = [
 const _data = {
   nodata: 'aaa',
   data1: data1,
+  data2: data2
 }
 
 const setData = (source, destination, droppableSource) => {
