@@ -34,7 +34,7 @@ const Clone = styled(Item)`
   }
 `
 
-const List = styled.div`
+const ListStyle = styled.div`
   border: 1px ${props => (props.isDraggingOver ? 'dashed #000' : 'solid #ddd')};
   background: #fff;
   padding: 0.5rem 0.5rem 0;
@@ -44,7 +44,7 @@ const List = styled.div`
   min-height: 56px;
 `
 
-const KioskContainer = styled(List)`
+const KioskContainer = styled(ListStyle)`
   position: absolute;
   top: 0;
   right: 0;
@@ -52,12 +52,12 @@ const KioskContainer = styled(List)`
   width: 50%;
 `
 
-const Kiosk = styled(List)`
+const Kiosk = styled(ListStyle)`
   position: relative;
   border: 0px;
 `
 
-const Container = styled(List)`
+const Container = styled(ListStyle)`
   margin: 0.5rem;
 `
 
@@ -126,8 +126,6 @@ const data = {
     },
   ],
 }
-
-console.log(data)
 
 const setData = (source, destination, droppableSource) => {
   const sourceClone = Object.assign({}, source)

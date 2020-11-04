@@ -34,7 +34,7 @@ const Clone = styled(Item)`
   }
 `
 
-const List = styled.div`
+const ListStyle = styled.div`
   border: 1px ${props => (props.isDraggingOver ? 'dashed #000' : 'solid #ddd')};
   background: #fff;
   padding: 0.5rem 0.5rem 0;
@@ -44,7 +44,7 @@ const List = styled.div`
   min-height: 56px;
 `
 
-const KioskContainer = styled(List)`
+const KioskContainer = styled(ListStyle)`
   position: absolute;
   top: 0;
   right: 0;
@@ -52,12 +52,12 @@ const KioskContainer = styled(List)`
   width: 50%;
 `
 
-const Kiosk = styled(List)`
+const Kiosk = styled(ListStyle)`
   position: relative;
   border: 0px;
 `
 
-const Container = styled(List)`
+const Container = styled(ListStyle)`
   margin: 0.5rem;
 `
 
@@ -98,9 +98,7 @@ const data1 = [
 ]
 
 const _data = {
-  nodata: 'aaa',
   data1: data1,
-  data2: data2,
 }
 
 const data = {
@@ -127,8 +125,6 @@ const data = {
   ],
 }
 
-console.log(data)
-
 const setData = (source, destination, droppableSource) => {
   const sourceClone = Object.assign({}, source)
   const destClone = Array.from(destination)
@@ -138,59 +134,119 @@ const setData = (source, destination, droppableSource) => {
   return destClone
 }
 
-class DragGroups extends Component {
+class DragAbleItem extends Component {
+  render() {
+    const { data, itm } = this.props
+    return data[itm].map(item =>
+      Object.keys(item).map((content, _idx) => {
+        const id = uuid()
+        return (
+          <Draggable key={id} draggableId={id} index={_idx}>
+            {(provided, snapshot) => (
+              <React.Fragment>
+                <Item
+                  key={id}
+                  className="li-item"
+                  innerRef={provided.innerRef}
+                  {...provided.draggableProps}
+                  {...provided.dragHandleProps}
+                  isDragging={snapshot.isDragging}
+                  style={provided.draggableProps.style}>
+                  {content}
+                </Item>
+                {snapshot.isDragging && <Clone>{content}</Clone>}
+              </React.Fragment>
+            )}
+          </Draggable>
+        )
+      })
+    )
+  }
+}
+
+class DroppableArea extends Component {
+  render() {
+    const { itm, idx, data } = this.props
+    return (
+      <Droppable
+        key={idx}
+        droppableId={itm}
+        isDropDisabled={true}
+        isCombineEnabled={true}>
+        {(provided, snapshot) => (
+          <Kiosk
+            className="ul-kiosk"
+            innerRef={provided.innerRef}
+            isDraggingOver={snapshot.isDraggingOver}>
+            <DragAbleItem itm={itm} data={data} />
+          </Kiosk>
+        )}
+      </Droppable>
+    )
+  }
+}
+
+class _DragGroups extends Component {
   render() {
     const { data } = this.props
     return (
       <KioskContainer>
         {Object.keys(data).map((itm, idx) => {
           return !Array.isArray(data[itm]) ? (
-            <li>{data[itm]}</li>
+            <li className="li-">{data[itm]}</li>
           ) : (
             <React.Fragment key={idx}>
-              <li>{itm}</li>
-              <Droppable
-                key={idx}
-                droppableId={itm}
-                isDropDisabled={true}
-                isCombineEnabled={true}>
-                {(provided, snapshot) => (
-                  <Kiosk
-                    innerRef={provided.innerRef}
-                    isDraggingOver={snapshot.isDraggingOver}>
-                    {data[itm].map(item =>
-                      Object.keys(item).map((content, _idx) => {
-                        const id = uuid()
-                        return (
-                          <Draggable key={id} draggableId={id} index={_idx}>
-                            {(provided, snapshot) => (
-                              <React.Fragment>
-                                <Item
-                                  key={id}
-                                  innerRef={provided.innerRef}
-                                  {...provided.draggableProps}
-                                  {...provided.dragHandleProps}
-                                  isDragging={snapshot.isDragging}
-                                  style={provided.draggableProps.style}>
-                                  {content}
-                                </Item>
-                                {snapshot.isDragging && (
-                                  <Clone>{content}</Clone>
-                                )}
-                              </React.Fragment>
-                            )}
-                          </Draggable>
-                        )
-                      })
-                    )}
-                  </Kiosk>
-                )}
-              </Droppable>
+              <li className="li-title">{itm}</li>
+              <DroppableArea data={data} itm={itm} idx={idx} />
             </React.Fragment>
           )
         })}
       </KioskContainer>
     )
+  }
+}
+
+class DragGroups extends Component {
+  list(data) {
+    const children = () => {}
+    return Object.keys(data).map((itm, idx) => {
+      return (
+        <React.Fragment key={idx}>
+          <DroppableArea data={data} itm={itm} idx={idx} />
+        </React.Fragment>
+      )
+    })
+  }
+  render() {
+    const { data } = this.props
+    return <KioskContainer>{this.list(data)}</KioskContainer>
+  }
+}
+
+class Drag_Group extends React.Component {
+  list(items) {
+    const children = items => {
+      return <DroppableArea data={data}>{this.list(items)}</DroppableArea>
+      //return <ul className="ul-kiosk">{this.list(items)}</ul>;
+    }
+
+    if (Array.isArray(items)) {
+      if (GET_ARRAY_LEVEL_0) {
+        return this.list(items[0])
+      } else {
+        return items.map(item => this.list(item))
+      }
+    } else if (typeof items === 'object' && items !== null) {
+      return Object.keys(items).map((item, idx) => (
+        <Item key={idx} name={item}>
+          {items[item]}
+        </Item>
+      ))
+    }
+  }
+  render() {
+    const { data } = this.props
+    return <KioskContainer>{this.list(data)}</KioskContainer>
   }
 }
 
