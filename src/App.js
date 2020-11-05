@@ -209,7 +209,13 @@ class _DragGroups extends Component {
 class DragGroups extends Component {
   list(items) {
     const children = l => l
-    if (typeof items === 'object' && items !== null) {
+    if (Array.isArray(items)) {
+      if (GET_ARRAY_LEVEL_0) {
+        return this.list(items[0]);
+      } else {
+        return items.map((item) => this.list(item));
+      }
+    } else if (typeof items === "object" && items !== null) {
       return Object.keys(items).map((itm, idx) => (
         <React.Fragment key={idx}>
           <DroppableArea itm={itm} idx={idx}>
@@ -221,7 +227,7 @@ class DragGroups extends Component {
   }
   render() {
     const { data } = this.props
-    return <KioskContainer>{this.list(data)}</KioskContainer>
+    return <KioskContainer>{this. (data)}</KioskContainer>
   }
 }
 
