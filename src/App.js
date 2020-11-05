@@ -217,17 +217,15 @@ class DragGroups extends Component {
       }
     } else if (typeof items === "object" && items !== null) {
       return Object.keys(items).map((itm, idx) => (
-        <React.Fragment key={idx}>
-          <DroppableArea itm={itm} idx={idx}>
-            {children(items[itm])}
-          </DroppableArea>
-        </React.Fragment>
+        <DroppableArea itm={itm} idx={idx}>
+          {children(items[itm])}
+        </DroppableArea>
       ))
     }
   }
   render() {
     const { data } = this.props
-    return <KioskContainer>{this. (data)}</KioskContainer>
+    return <KioskContainer>{this.list(data)}</KioskContainer>
   }
 }
 
