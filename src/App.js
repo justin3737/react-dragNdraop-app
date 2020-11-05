@@ -136,8 +136,8 @@ const setData = (source, destination, droppableSource) => {
 
 class DragAbleItem extends Component {
   render() {
-    const { data, itm } = this.props
-    return data[itm].map(item =>
+    const { data } = this.props
+    return data.map(item =>
       Object.keys(item).map((content, _idx) => {
         const id = uuid()
         return (
@@ -166,7 +166,7 @@ class DragAbleItem extends Component {
 
 class DroppableArea extends Component {
   render() {
-    const { itm, idx, data } = this.props
+    const { itm, idx, children } = this.props
     return (
       <Droppable
         key={idx}
@@ -178,7 +178,7 @@ class DroppableArea extends Component {
             className="ul-kiosk"
             innerRef={provided.innerRef}
             isDraggingOver={snapshot.isDraggingOver}>
-            <DragAbleItem itm={itm} data={data} />
+            <DragAbleItem data={children} />
           </Kiosk>
         )}
       </Droppable>
@@ -207,15 +207,17 @@ class _DragGroups extends Component {
 }
 
 class DragGroups extends Component {
-  list(data) {
-    const children = () => {}
-    return Object.keys(data).map((itm, idx) => {
-      return (
+  list(items) {
+    const children = l => l
+    if (typeof items === 'object' && items !== null) {
+      return Object.keys(items).map((itm, idx) => (
         <React.Fragment key={idx}>
-          <DroppableArea data={data} itm={itm} idx={idx} />
+          <DroppableArea itm={itm} idx={idx}>
+            {children(items[itm])}
+          </DroppableArea>
         </React.Fragment>
-      )
-    })
+      ))
+    }
   }
   render() {
     const { data } = this.props
