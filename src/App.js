@@ -97,11 +97,7 @@ const data1 = [
   },
 ]
 
-const _data = {
-  data1: data1,
-}
-
-const data = {
+const mydata = {
   items: [
     {
       id: 15,
@@ -134,11 +130,20 @@ const setData = (source, destination, droppableSource) => {
   return destClone
 }
 
+class ListItem extends Component {
+  render() {
+    const { children } = this.props
+    console.log('children: ', children)
+    return <li className="li-item">{children}</li>
+  }
+}
+
 class DragAbleItem extends Component {
   render() {
-    const { data } = this.props
-    return data.map(item =>
-      Object.keys(item).map((content, _idx) => {
+    const { children } = this.props
+    if (typeof children === 'string') return <li className="li">{children}</li>
+    return children.map(item => {
+      return Object.keys(item).map((content, _idx) => {
         const id = uuid()
         return (
           <Draggable key={id} draggableId={id} index={_idx}>
@@ -160,16 +165,16 @@ class DragAbleItem extends Component {
           </Draggable>
         )
       })
-    )
+    })
   }
 }
 
 class DroppableArea extends Component {
   render() {
-    const { itm, idx, children } = this.props
+    const { itm, children } = this.props
     return (
       <Droppable
-        key={idx}
+        key={uuid()}
         droppableId={itm}
         isDropDisabled={true}
         isCombineEnabled={true}>
@@ -178,7 +183,7 @@ class DroppableArea extends Component {
             className="ul-kiosk"
             innerRef={provided.innerRef}
             isDraggingOver={snapshot.isDraggingOver}>
-            <DragAbleItem data={children} />
+            <DragAbleItem>{children}</DragAbleItem>
           </Kiosk>
         )}
       </Droppable>
@@ -186,56 +191,55 @@ class DroppableArea extends Component {
   }
 }
 
-class _DragGroups extends Component {
-  render() {
-    const { data } = this.props
-    return (
-      <KioskContainer>
-        {Object.keys(data).map((itm, idx) => {
-          return !Array.isArray(data[itm]) ? (
-            <li className="li-">{data[itm]}</li>
-          ) : (
-            <React.Fragment key={idx}>
-              <li className="li-title">{itm}</li>
-              <DroppableArea data={data} itm={itm} idx={idx} />
-            </React.Fragment>
-          )
-        })}
-      </KioskContainer>
-    )
-  }
-}
+// class _DragGroups extends Component {
+//   render() {
+//     const { data } = this.props
+//     return (
+//       <KioskContainer>
+//         {Object.keys(data).map((itm, idx) => {
+//           return !Array.isArray(data[itm]) ? (
+//             <li className="li-">{data[itm]}</li>
+//           ) : (
+//             <React.Fragment key={idx}>
+//               <li className="li-title">{itm}</li>
+//               <DroppableArea data={data} itm={itm} idx={idx} />
+//             </React.Fragment>
+//           )
+//         })}
+//       </KioskContainer>
+//     )
+//   }
+// }
+
+// class DragGroups extends Component {
+//   list(items) {
+//     const children = l => l
+//     // const children = items => {
+//     //   return <DroppableArea>{this.list(items)}</DroppableArea>
+//     // }
+//     if (Array.isArray(items)) {
+//       if (GET_ARRAY_LEVEL_0) {
+//         return this.list(items[0])
+//       } else {
+//         return items.map(item => this.list(item))
+//       }
+//     } else if (typeof items === 'object' && items !== null) {
+//       return Object.keys(items).map((itm, idx) => {
+//         return (
+//           <li>
+//             <div>{itm}</div>
+//             <DroppableArea itm={itm} idx={idx}>
+//               {children(items[itm])}
+//             </DroppableArea>
+//           </li>
+//         )
+//       })
+//     }
+//   }
 
 class DragGroups extends Component {
   list(items) {
     const children = l => l
-    if (Array.isArray(items)) {
-      if (GET_ARRAY_LEVEL_0) {
-        return this.list(items[0]);
-      } else {
-        return items.map((item) => this.list(item));
-      }
-    } else if (typeof items === "object" && items !== null) {
-      return Object.keys(items).map((itm, idx) => (
-        <DroppableArea itm={itm} idx={idx}>
-          {children(items[itm])}
-        </DroppableArea>
-      ))
-    }
-  }
-  render() {
-    const { data } = this.props
-    return <KioskContainer>{this.list(data)}</KioskContainer>
-  }
-}
-
-class Drag_Group extends React.Component {
-  list(items) {
-    const children = items => {
-      return <DroppableArea data={data}>{this.list(items)}</DroppableArea>
-      //return <ul className="ul-kiosk">{this.list(items)}</ul>;
-    }
-
     if (Array.isArray(items)) {
       if (GET_ARRAY_LEVEL_0) {
         return this.list(items[0])
@@ -243,11 +247,14 @@ class Drag_Group extends React.Component {
         return items.map(item => this.list(item))
       }
     } else if (typeof items === 'object' && items !== null) {
-      return Object.keys(items).map((item, idx) => (
-        <Item key={idx} name={item}>
-          {items[item]}
-        </Item>
-      ))
+      return Object.keys(items).map((itm, idx) => {
+        return <li>
+          <div>{itm}</div>
+          <DroppableArea itm={itm} idx={idx}>
+            {children(items[itm])}
+          </DroppableArea>
+        </li>
+      })
     }
   }
   render() {
@@ -255,6 +262,56 @@ class Drag_Group extends React.Component {
     return <KioskContainer>{this.list(data)}</KioskContainer>
   }
 }
+// class DragGroups extends Component {
+//   list(items) {
+//     //const children = l => l
+//     const children = (items, itm) => {
+//       return <DroppableArea itm={itm}>{this.list(items)}</DroppableArea>
+//     }
+//     if (Array.isArray(items)) {
+//       if (GET_ARRAY_LEVEL_0) {
+//         return this.list(items[0])
+//       } else {
+//         return items.map(item => this.list(item))
+//       }
+//     } else if (typeof items === 'object' && items !== null) {
+//       return Object.keys(items).map((itm, idx) => {
+//         return <ListItem key={idx}>{children(items[itm], itm)}</ListItem>
+//       })
+//     }
+//   }
+//   render() {
+//     const { data } = this.props
+//     return <KioskContainer>{this.list(data)}</KioskContainer>
+//   }
+// }
+
+// class Drag_Group extends React.Component {
+//   list(items) {
+//     const children = items => {
+//       return <DroppableArea>{this.list(items)}</DroppableArea>
+//       //return <ul className="ul-kiosk">{this.list(items)}</ul>;
+//     }
+
+//     if (Array.isArray(items)) {
+//       if (GET_ARRAY_LEVEL_0) {
+//         return this.list(items[0])
+//       } else {
+//         return items.map(item => this.list(item))
+//       }
+//     } else if (typeof items === 'object' && items !== null) {
+//       return Object.keys(items).map((item, idx) => (
+//         <Item key={idx} name={item}>
+//           {items[item]}
+//         </Item>
+//       ))
+//     }
+//   }
+//   render() {
+//     const { data } = this.props
+//     return <KioskContainer>{this.list(data)}</KioskContainer>
+//   }
+// }
 
 export default class App extends Component {
   state = { ...makeList(container_amount) }
@@ -393,3 +450,261 @@ const jsonData = `
     }
   }
 `
+
+const mrdata = {
+  Response: {
+    StatusCode: 'SUCCESS',
+    Value: {
+      Elements: [
+        {
+          Extension: {
+            App: [
+              {
+                Key: 'type',
+                Mandatory: 'Y',
+                Value: '4',
+              },
+            ],
+            Attribute: {},
+            Custom: [
+              {
+                Key: 'tracking_id',
+                Mandatory: 'Y',
+                Value: '',
+              },
+            ],
+            Metadata: {
+              ShortId: 'INLINE',
+            },
+          },
+          Icon:
+            'https://at-uat-static.oopocket-dev.com/store/inline.1599207472695.gif',
+          Label: '餐廳預約',
+          Page: {
+            Component: 'THIRD_PARTY_SERVICE',
+            TargetUrl:
+              'https://at-uat.oopocket-dev.com/app/19593305-5b0f-4743-ae99-2fb0acb6b523/platform/f4e13d0e-5c45-44a6-9111-57c9b6fa751b/view',
+          },
+        },
+        {
+          Extension: {
+            App: [
+              {
+                Key: 'type',
+                Mandatory: 'Y',
+                Value: '4',
+              },
+            ],
+            Attribute: {},
+            Custom: [],
+            Metadata: {
+              ShortId: 'VECpreprod',
+            },
+          },
+          Icon:
+            'https://at-uat-static.oopocket-dev.com/store/icShopping60Multi02@3x.1595489378491.png',
+          Label: '購物封測',
+          Page: {
+            Component: 'THIRD_PARTY_SERVICE',
+            TargetUrl: 'https://www.preprod.orca-vec.com',
+          },
+        },
+        {
+          Extension: {
+            App: [
+              {
+                Key: 'type',
+                Mandatory: 'Y',
+                Value: '4',
+              },
+            ],
+            Attribute: {},
+            Custom: [],
+            Metadata: {
+              ShortId: 'KLOOK',
+            },
+          },
+          Icon:
+            'https://at-uat-static.oopocket-dev.com/store/travel.1599207537389.gif',
+          Label: '旅遊體驗',
+          Page: {
+            Component: 'THIRD_PARTY_SERVICE',
+            TargetUrl:
+              'https://at-uat.oopocket-dev.com/app/e0e10e17-0c02-47f3-a232-c8ba1a1bc5df/platform/f4e13d0e-5c45-44a6-9111-57c9b6fa751b/view',
+          },
+        },
+        {
+          Extension: {
+            App: [
+              {
+                Key: 'type',
+                Mandatory: 'Y',
+                Value: '4',
+              },
+            ],
+            Attribute: {},
+            Custom: [
+              {
+                Key: 'tracking_id',
+                Mandatory: 'N',
+                Value: '',
+              },
+            ],
+            Metadata: {
+              ShortId: 'FUNNOW',
+            },
+          },
+          Icon:
+            'https://at-uat-static.oopocket-dev.com/store/funnow.1599207453325.gif',
+          Label: '娛樂舒壓',
+          Page: {
+            Component: 'THIRD_PARTY_SERVICE',
+            TargetUrl:
+              'https://at-uat.oopocket-dev.com/app/d90a0d55-30e3-47d2-ab0b-6433bf238719/platform/f4e13d0e-5c45-44a6-9111-57c9b6fa751b/view',
+          },
+        },
+        {
+          Extension: {
+            App: [
+              {
+                Key: 'type',
+                Mandatory: 'Y',
+                Value: '6',
+              },
+            ],
+            Attribute: {},
+            Custom: [
+              {
+                Key: 'tracking_id',
+                Mandatory: 'Y',
+                Value: '',
+              },
+            ],
+            Metadata: {
+              ShortId: 'AUTOPASS',
+            },
+          },
+          Icon:
+            'https://at-uat-static.oopocket-dev.com/store/parking.1599207518568.gif',
+          Label: '加油停車',
+          Page: {
+            Component: 'THIRD_PARTY_SERVICE',
+            TargetUrl:
+              'https://at-uat.oopocket-dev.com/app/2a43e0d2-a5da-4dc1-9533-04ab1800bbf1/platform/f4e13d0e-5c45-44a6-9111-57c9b6fa751b/view',
+          },
+        },
+        {
+          Extension: {
+            App: [
+              {
+                Key: 'type',
+                Mandatory: 'Y',
+                Value: '4',
+              },
+            ],
+            Attribute: {},
+            Custom: [],
+            Metadata: {
+              ShortId: 'EZDING',
+            },
+          },
+          Icon:
+            'https://at-uat-static.oopocket-dev.com/store/ezding.1599811926590.gif',
+          Label: '看電影',
+          Page: {
+            Component: 'THIRD_PARTY_SERVICE',
+            TargetUrl:
+              'https://at-uat.oopocket-dev.com/app/16da7799-b904-4ec1-83bd-de61c94f1209/platform/f4e13d0e-5c45-44a6-9111-57c9b6fa751b/view',
+          },
+        },
+        {
+          Extension: {
+            App: [
+              {
+                Key: 'type',
+                Mandatory: 'Y',
+                Value: '4',
+              },
+            ],
+            Attribute: {},
+            Custom: [],
+            Metadata: {
+              ShortId: 'TREEMALL',
+            },
+          },
+          Icon:
+            'https://at-uat-static.oopocket-dev.com/store/vec.1599207557500.gif',
+          Label: '新閃購',
+          Page: {
+            Component: 'VERTICAL_EC',
+            TargetUrl: 'https://www-at-uat.orca-vec-dev.com/',
+          },
+        },
+        {
+          Extension: {
+            App: [
+              {
+                Key: 'type',
+                Mandatory: 'Y',
+                Value: '6',
+              },
+            ],
+            Attribute: {},
+            Custom: [
+              {
+                Key: 'tracking_id',
+                Mandatory: 'N',
+                Value: '',
+              },
+            ],
+            Metadata: {
+              ShortId: 'EZTABLE',
+            },
+          },
+          Icon:
+            'https://at-uat-static.oopocket-dev.com/store/eztable.1599207434243.gif',
+          Label: '餐廳預付',
+          Page: {
+            Component: 'THIRD_PARTY_SERVICE',
+            TargetUrl:
+              'https://at-uat.oopocket-dev.com/app/b1a475e4-bf92-4725-9310-dc3fc48ae960/platform/f4e13d0e-5c45-44a6-9111-57c9b6fa751b/view',
+          },
+        },
+        {
+          Extension: {
+            App: [
+              {
+                Key: 'type',
+                Mandatory: 'Y',
+                Value: '6',
+              },
+            ],
+            Attribute: {},
+            Custom: [
+              {
+                Key: 'tracking_id',
+                Mandatory: 'Y',
+                Value: '',
+              },
+            ],
+            Metadata: {
+              ShortId: 'CUTAWAY',
+            },
+          },
+          Icon:
+            'https://at-uat-static.oopocket-dev.com/store/cutaway.1599207406861.gif',
+          Label: '美食外送',
+          Page: {
+            Component: 'THIRD_PARTY_SERVICE',
+            TargetUrl:
+              'https://at-uat.oopocket-dev.com/app/99fb7dca-f1cd-4223-9f54-1c8429c19c4f/platform/f4e13d0e-5c45-44a6-9111-57c9b6fa751b/view',
+          },
+        },
+      ],
+    },
+  },
+}
+
+const _data = {
+  data1,
+}
